@@ -8,8 +8,8 @@
     <!-- CSS Link -->
     <link rel="stylesheet" href="assets/style.css">
     
-    <!-- PDF.js Library Link -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 
     <style>
         .upload-container {
@@ -21,14 +21,15 @@
         }
 
         .upload-card {
-            background: white;
+            background: #ffffff;
             padding: 20px;
             border-radius: 8px;
             text-align: center;
             border: 2px dashed #0d6efd;
             flex: 1;
-            min-width: 250px;
-            max-width: 400px;
+            min-width: 260px;
+            max-width: 420px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
         .upload-btn {
@@ -58,6 +59,7 @@
             text-align: center;
         }
 
+        /* Printable PVC Size Frame */
         .card-preview {
             width: 85.6mm;
             height: 53.9mm;
@@ -71,21 +73,48 @@
             color: #6c757d;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             overflow: hidden;
+            position: relative;
         }
 
         .card-preview img, .card-preview canvas {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.1s ease;
+        }
+
+        /* Zoom & Crop Controls */
+        .crop-controls {
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .crop-controls button {
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .crop-controls button:hover {
+            background: #dee2e6;
         }
 
         .action-btns {
             text-align: center;
-            margin-top: 25px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
 
-        .btn-success {
-            background: #198754;
+        .btn-print {
+            background: #0d6efd;
             color: white;
             padding: 12px 30px;
             border: none;
@@ -93,10 +122,50 @@
             font-size: 16px;
             cursor: pointer;
             font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn-success:hover {
-            background: #157347;
+        .btn-print:hover {
+            background: #0b5ed7;
+        }
+
+        /* Direct Print Layout Styling (CSS for Printer) */
+        @media print {
+            header, nav, .upload-container, .section-title, .crop-controls, .action-btns, footer {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .preview-container {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 10mm !important;
+                justify-content: start !important;
+                margin: 10mm !important;
+            }
+
+            .card-preview {
+                border: 1px solid #000 !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+
+            .card-box h4 {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -118,47 +187,56 @@
     <div class="container">
         <div class="section-title">
             <h2>ID Card Smart Print Tool</h2>
-            <p>आगे (Front) और पीछे (Back) दोनों साइड की फाइलें चुनें</p>
+            <p>फाइल लोड करें, ज़ूम/क्रॉप सेट करें और सीधे प्रिंट करें</p>
         </div>
 
-        <!-- Separate Upload Boxes -->
+        <!-- File Upload Area -->
         <div class="upload-container">
-            <!-- Front Upload -->
             <div class="upload-card">
                 <h3>Front Side (आगे का भाग)</h3>
-                <p>PDF/Image सेलेक्ट करें</p>
+                <p>PDF या Image चुनें</p>
                 <label class="upload-btn">
-                    📁 Choose Front File
+                    📁 Select Front File
                     <input type="file" id="frontFileInput" accept="application/pdf, image/*">
                 </label>
             </div>
 
-            <!-- Back Upload -->
             <div class="upload-card">
                 <h3>Back Side (पीछे का भाग)</h3>
-                <p>PDF/Image सेलेक्ट करें</p>
+                <p>PDF या Image चुनें</p>
                 <label class="upload-btn" style="background:#198754;">
-                    📁 Choose Back File
+                    📁 Select Back File
                     <input type="file" id="backFileInput" accept="application/pdf, image/*">
                 </label>
             </div>
         </div>
 
-        <!-- Preview Area -->
+        <!-- Preview Area with Crop Controls -->
         <div class="preview-container">
             <div class="card-box">
-                <h4>Front Preview</h4>
-                <div class="card-preview" id="frontPreview">Front Card Preview</div>
+                <h4>Front Side Preview</h4>
+                <div class="card-preview" id="frontPreview">Front Preview Here</div>
+                <div class="crop-controls">
+                    <button onclick="adjustZoom('frontPreview', 0.1)">➕ Zoom In</button>
+                    <button onclick="adjustZoom('frontPreview', -0.1)">➖ Zoom Out</button>
+                    <button onclick="resetZoom('frontPreview')">🔄 Reset</button>
+                </div>
             </div>
+
             <div class="card-box">
-                <h4>Back Preview</h4>
-                <div class="card-preview" id="backPreview">Back Card Preview</div>
+                <h4>Back Side Preview</h4>
+                <div class="card-preview" id="backPreview">Back Preview Here</div>
+                <div class="crop-controls">
+                    <button onclick="adjustZoom('backPreview', 0.1)">➕ Zoom In</button>
+                    <button onclick="adjustZoom('backPreview', -0.1)">➖ Zoom Out</button>
+                    <button onclick="resetZoom('backPreview')">🔄 Reset</button>
+                </div>
             </div>
         </div>
 
-        <!-- Download Buttons -->
+        <!-- Print Action Button -->
         <div class="action-btns">
-            <button class="btn-success" id="downloadPdfBtn">🖨️ Generate Printable Sheet (A4 / 4x6)</button>
+            <button class="btn-print" id="directPrintBtn">🖨️ Direct Print Command</button>
         </div>
     </div>
 
