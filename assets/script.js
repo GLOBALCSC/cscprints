@@ -1,24 +1,49 @@
+// Zoom Levels Storage
+const zoomLevels = {
+    frontPreview: 1,
+    backPreview: 1
+};
+
+// Adjust Crop / Zoom Function
+function adjustZoom(containerId, change) {
+    const container = document.getElementById(containerId);
+    const element = container.querySelector('img') || container.querySelector('canvas');
+    if (!element) return;
+
+    zoomLevels[containerId] = Math.max(0.5, Math.min(2.5, zoomLevels[containerId] + change));
+    element.style.transform = `scale(${zoomLevels[containerId]})`;
+}
+
+// Reset Crop / Zoom Function
+function resetZoom(containerId) {
+    const container = document.getElementById(containerId);
+    const element = container.querySelector('img') || container.querySelector('canvas');
+    if (!element) return;
+
+    zoomLevels[containerId] = 1;
+    element.style.transform = `scale(1)`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const frontFileInput = document.getElementById('frontFileInput');
     const backFileInput = document.getElementById('backFileInput');
     const frontPreview = document.getElementById('frontPreview');
     const backPreview = document.getElementById('backPreview');
-    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    const directPrintBtn = document.getElementById('downloadPdfBtn') || document.getElementById('directPrintBtn');
 
     if (window.pdfjsLib) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
     }
 
-    // Helper function to process uploaded file (Image or PDF)
     async function processFile(file, targetContainer) {
         if (!file) return;
 
-        targetContainer.innerHTML = `<span>⏳ Loading...</span>`;
+        targetContainer.innerHTML = `<span>⏳ Processing...</span>`;
 
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function (event) {
-                targetContainer.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                targetContainer.innerHTML = `<img src="${event.target.result}" alt="Card Image">`;
             };
             reader.readAsDataURL(file);
         } else if (file.type === 'application/pdf') {
@@ -40,32 +65,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 targetContainer.appendChild(canvas);
             } catch (error) {
                 console.error(error);
-                alert("PDF लोड करने में दिक्कत हुई!");
-                targetContainer.innerHTML = `<span>Error</span>`;
+                alert("PDF लोड करने में समस्या आई!");
+                targetContainer.innerHTML = `<span>Error Loading</span>`;
             }
-        } else {
-            alert('कृपया इमेज या PDF फाइल ही चुनें!');
         }
     }
 
-    // Front File Selection
     if (frontFileInput) {
         frontFileInput.addEventListener('change', (e) => {
+            zoomLevels.frontPreview = 1;
             processFile(e.target.files[0], frontPreview);
         });
     }
 
-    // Back File Selection
     if (backFileInput) {
         backFileInput.addEventListener('change', (e) => {
+            zoomLevels.backPreview = 1;
             processFile(e.target.files[0], backPreview);
         });
     }
 
-    // Action Button
-    if (downloadPdfBtn) {
-        downloadPdfBtn.addEventListener('click', () => {
-            alert('A4 / 4x6 HD Print Sheet तैयार है!');
+    // Direct Print Command
+    if (directPrintBtn) {
+        directPrintBtn.addEventListener('click', () => {
+            window.print();
         });
     }
 });
