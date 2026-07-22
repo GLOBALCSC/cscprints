@@ -1,74 +1,71 @@
-// CSC Print Portal - ID Card Auto Crop & Print Logic
-
 document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.getElementById('fileInput');
+    const frontFileInput = document.getElementById('frontFileInput');
+    const backFileInput = document.getElementById('backFileInput');
     const frontPreview = document.getElementById('frontPreview');
     const backPreview = document.getElementById('backPreview');
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
-    // Configure PDF.js worker
     if (window.pdfjsLib) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     }
 
-    if (fileInput) {
-        fileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+    // Helper function to process uploaded file (Image or PDF)
+    async function processFile(file, targetContainer) {
+        if (!file) return;
 
-            frontPreview.innerHTML = `<span>⏳ Processing File...</span>`;
-            backPreview.innerHTML = `<span>⏳ Processing File...</span>`;
+        targetContainer.innerHTML = `<span>⏳ Loading...</span>`;
 
-            // If file is Image
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    frontPreview.innerHTML = `<img src="${event.target.result}" alt="Front Side">`;
-                    backPreview.innerHTML = `<p style="padding:10px; color:#6c757d;">(Optional) दूसरी फ़ाइल अपलोड करें या Crop एडजस्ट करें</p>`;
-                };
-                reader.readAsDataURL(file);
-            } 
-            // If file is PDF (Aadhaar, PAN, Voter, DL)
-            else if (file.type === 'application/pdf') {
-                try {
-                    const fileArrayBuffer = await file.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument({ data: fileArrayBuffer }).promise;
-                    
-                    // Render First Page of PDF
-                    const page = await pdf.getPage(1);
-                    const scale = 2; // High Resolution
-                    const viewport = page.getViewport({ scale });
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                targetContainer.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+            try {
+                const fileArrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: fileArrayBuffer }).promise;
+                const page = await pdf.getPage(1);
+                const scale = 2;
+                const viewport = page.getViewport({ scale });
 
-                    // Canvas 1 (Front Side)
-                    const canvasFront = document.createElement('canvas');
-                    const contextFront = canvasFront.getContext('2d');
-                    canvasFront.height = viewport.height;
-                    canvasFront.width = viewport.width;
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
 
-                    await page.render({ canvasContext: contextFront, viewport: viewport }).promise;
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
 
-                    // Display Front & Back Preview
-                    frontPreview.innerHTML = '';
-                    frontPreview.appendChild(canvasFront);
-
-                    backPreview.innerHTML = `<p style="padding:15px; color:#198754; font-weight:bold;">✅ PDF Rendered Successfully!<br><small>Ready for PVC Printable Layout</small></p>`;
-
-                } catch (error) {
-                    console.error(error);
-                    alert("PDF पढ़ने में समस्या आई! अगर PDF पासवर्ड प्रोटेक्टेड है, तो कृपया सही फ़ाइल चुनें।");
-                    frontPreview.innerHTML = `<span>Front Preview</span>`;
-                    backPreview.innerHTML = `<span>Back Preview</span>`;
-                }
-            } else {
-                alert('कृपया केवल PDF या Image फ़ाइल ही चुनें!');
+                targetContainer.innerHTML = '';
+                targetContainer.appendChild(canvas);
+            } catch (error) {
+                console.error(error);
+                alert("PDF लोड करने में दिक्कत हुई!");
+                targetContainer.innerHTML = `<span>Error</span>`;
             }
+        } else {
+            alert('कृपया इमेज या PDF फाइल ही चुनें!');
+        }
+    }
+
+    // Front File Selection
+    if (frontFileInput) {
+        frontFileInput.addEventListener('change', (e) => {
+            processFile(e.target.files[0], frontPreview);
         });
     }
 
-    // Generate Printable PDF Action
+    // Back File Selection
+    if (backFileInput) {
+        backFileInput.addEventListener('change', (e) => {
+            processFile(e.target.files[0], backPreview);
+        });
+    }
+
+    // Action Button
     if (downloadPdfBtn) {
         downloadPdfBtn.addEventListener('click', () => {
-            alert('🎉 A4 / 4x6 HD Printable Sheet जल्द ही डाउनलोड होगी! लेआउट ऑटो-सेट हो गया है।');
+            alert('A4 / 4x6 HD Print Sheet तैयार है!');
         });
     }
 });
