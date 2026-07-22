@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Card Print Tool - CSC Print</title>
+    <link rel="stylesheet" href="assets/style.css">
+    
+    <style>
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px dashed #0d6efd;
+            margin-bottom: 20px;
+        }
+
+        .upload-btn {
+            background: #0d6efd;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .upload-btn input {
+            display: none;
+        }
+
+        .preview-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .card-preview {
+            width: 85.6mm;
+            height: 53.9mm;
+            border: 1px solid #ccc;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6c757d;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .action-btns {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-success {
+            background: #198754;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌐 CSC Print Portal</h1>
+        <p>Professional Smart ID Card Crop & Print Tool</p>
+    </header>
+
+    <nav>
+        <a href="index.html">🏠 Dashboard</a>
+        <a href="id-card-print.html" class="active">🪪 ID Card Print</a>
+    </nav>
+
+    <div class="container">
+        <div class="section-title">
+            <h2>ID Card Smart Print Tool</h2>
+            <p>PDF या Image अपलोड करें और 1-Click में PVC साइज तैयार करें</p>
+        </div>
+
+        <!-- Upload Box -->
+        <div class="upload-section">
+            <h3>अपनी PDF या Image फ़ाइल चुनें</h3>
+            <p>Aadhaar, PAN, Voter ID, DL PDF अपलोड करें</p>
+            <label class="upload-btn">
+                📁 Select File
+                <input type="file" id="fileInput" accept="application/pdf, image/*">
+            </label>
+        </div>
+
+        <!-- Preview Area -->
+        <div class="preview-container">
+            <div>
+                <h4>Front Side</h4>
+                <div class="card-preview" id="frontPreview">Front Card Preview</div>
+            </div>
+            <div>
+                <h4>Back Side</h4>
+                <div class="card-preview" id="backPreview">Back Card Preview</div>
+            </div>
+        </div>
+
+        <!-- Action Area -->
+        <div class="action-btns">
+            <button class="btn-success" id="downloadPdfBtn">Download Printable Sheet (A4 / 4x6)</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Copyright © 2026 Global CSC Print | All Rights Reserved</p>
+    </footer>
+
+</body>
+</html>
