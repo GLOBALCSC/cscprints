@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ID Card Print Tool - CSC Print</title>
+
+    <!-- CSS Link -->
     <link rel="stylesheet" href="assets/style.css">
     
+    <!-- PDF.js Library Link for PDF Processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
     <style>
         .upload-section {
             background: white;
@@ -39,59 +44,78 @@
             margin-top: 20px;
         }
 
+        .card-box {
+            text-align: center;
+        }
+
         .card-preview {
             width: 85.6mm;
             height: 53.9mm;
-            border: 1px solid #ccc;
-            background: #e9ecef;
+            border: 2px dashed #0d6efd;
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
-            font-size: 12px;
+            border-radius: 6px;
+            font-size: 13px;
             color: #6c757d;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-preview canvas, .card-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .action-btns {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .btn-success {
             background: #198754;
             color: white;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
             font-weight: bold;
         }
+
+        .btn-success:hover {
+            background: #157347;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Header -->
     <header>
         <h1>🌐 CSC Print Portal</h1>
         <p>Professional Smart ID Card Crop & Print Tool</p>
     </header>
 
+    <!-- Navigation -->
     <nav>
         <a href="index.html">🏠 Dashboard</a>
         <a href="id-card-print.html" class="active">🪪 ID Card Print</a>
     </nav>
 
+    <!-- Main Content -->
     <div class="container">
         <div class="section-title">
             <h2>ID Card Smart Print Tool</h2>
-            <p>PDF या Image अपलोड करें और 1-Click में PVC साइज तैयार करें</p>
+            <p>PDF या Image अपलोड करें और 1-Click में PVC साइज़ (85.6mm × 53.9mm) में तैयार करें</p>
         </div>
 
-        <!-- Upload Box -->
+        <!-- File Upload Area -->
         <div class="upload-section">
             <h3>अपनी PDF या Image फ़ाइल चुनें</h3>
-            <p>Aadhaar, PAN, Voter ID, DL PDF अपलोड करें</p>
+            <p>Aadhaar, PAN, Voter ID, DL की PDF या फोटो लोड करें</p>
             <label class="upload-btn">
                 📁 Select File
                 <input type="file" id="fileInput" accept="application/pdf, image/*">
@@ -100,25 +124,29 @@
 
         <!-- Preview Area -->
         <div class="preview-container">
-            <div>
-                <h4>Front Side</h4>
+            <div class="card-box">
+                <h4>Front Side (आगे का भाग)</h4>
                 <div class="card-preview" id="frontPreview">Front Card Preview</div>
             </div>
-            <div>
-                <h4>Back Side</h4>
+            <div class="card-box">
+                <h4>Back Side (पीछे का भाग)</h4>
                 <div class="card-preview" id="backPreview">Back Card Preview</div>
             </div>
         </div>
 
-        <!-- Action Area -->
+        <!-- Download Buttons -->
         <div class="action-btns">
-            <button class="btn-success" id="downloadPdfBtn">Download Printable Sheet (A4 / 4x6)</button>
+            <button class="btn-success" id="downloadPdfBtn">🖨️ Generate Printable Sheet (A4 / 4x6)</button>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer>
         <p>Copyright © 2026 Global CSC Print | All Rights Reserved</p>
     </footer>
+
+    <!-- JS Link -->
+    <script src="assets/script.js"></script>
 
 </body>
 </html>
